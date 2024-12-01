@@ -1,5 +1,5 @@
-# aoc-xxxx
-Solutions to xxxx [Advent of Code] [1]
+# aoc-2024
+Solutions to 2024 [Advent of Code] [1]
 
 ## Project Setup
 This project creates a folder for each day problem.  Basic structure is:
