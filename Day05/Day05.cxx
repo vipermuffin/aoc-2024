@@ -62,111 +62,54 @@ namespace AocDay05 {
         return to_string(sum);
     }
 
-std::vector<Node> buildOrderingGuide(const std::vector<std::string>& input) {
-    vector<Node> orderingGuide{};
-    orderingGuide.resize(100);
-    auto itr = input.begin();
-    while(itr != input.end() && *itr != "") {
-        int b,a;
-        sscanf(itr->c_str(),"%d|%d",&b,&a);
-        orderingGuide[b].val = b;
-        orderingGuide[b].after.push_back(a);
-        orderingGuide[a].val = a;
-        orderingGuide[a].before.push_back(b);
-        itr++;
-    }
-    return orderingGuide;
-}
-
-void orderNodes(const std::vector<Node>& nodes, std::vector<int>& nodeList, std::vector<bool>& placed, int currentNode) {
-    const Node& n = nodes[currentNode];
-    for(const auto& bN : n.before) {
-        if(!placed[bN]) {
-            orderNodes(nodes, nodeList, placed, bN);
-        }
-    }
-    
-    if(!placed[currentNode]) {
-        nodeList.push_back(currentNode);
-        placed[currentNode] = true;
-    }
-
-    for(const auto& aN : n.after) {
-        if(!placed[aN]) {
-            orderNodes(nodes, nodeList, placed, aN);
-        }
-    }
-}
-
-std::vector<int> buildOrderedList(const std::vector<Node>& nodes) {
-    vector<int> orderedList{};
-    vector<bool> placed{};
-    placed.resize(100);
-    auto itr = nodes.begin();
-    bool notFound = true;
-    while(notFound && itr != nodes.end()) {
-        if(itr->val == -1) {
-            itr++;
-        } else if(itr->before.size() == 0) {
-            notFound = false;
-        } else {
+    std::vector<Node> buildOrderingGuide(const std::vector<std::string>& input) {
+        vector<Node> orderingGuide{};
+        orderingGuide.resize(100);
+        auto itr = input.begin();
+        while(itr != input.end() && *itr != "") {
+            int b,a;
+            sscanf(itr->c_str(),"%d|%d",&b,&a);
+            orderingGuide[b].val = b;
+            orderingGuide[b].after.push_back(a);
+            orderingGuide[a].val = a;
+            orderingGuide[a].before.push_back(b);
             itr++;
         }
+        return orderingGuide;
     }
-    orderNodes(nodes, orderedList, placed, itr->val);
 
-    return orderedList;
-}
-
-bool verifyOrder(const std::vector<int>& masterList,const std::string& pageOrderToVerify) {
-    auto pages = parseCsvLineForNum(pageOrderToVerify);
-    auto masterItr = masterList.begin();
-    auto itr = pages.begin();
-    while(itr != pages.end()) {
-        if(masterItr == masterList.end()) {
-            return false;
-        } else if(*itr == *masterItr) {
-            itr++;
-        } else {
-            masterItr++;
+    bool verifyOrder(const std::vector<Node>& masterList,const std::string& pageOrderToVerify) {
+        auto pages = parseCsvLineForNum(pageOrderToVerify);
+        auto rItr = pages.rbegin();
+        std::vector<int> prevs{};
+        while(rItr != pages.rend()) {
+            for(const auto& p : prevs) {
+                if(std::find(masterList[*rItr].after.begin(),masterList[*rItr].after.end(),p) == masterList[*rItr].after.end()) {
+                    return false;
+                }
+            }
+            prevs.push_back(*rItr);
+            rItr++;
         }
+        return true;
     }
-    return true;
-}
 
-bool verifyOrder(const std::vector<Node>& masterList,const std::string& pageOrderToVerify) {
-    auto pages = parseCsvLineForNum(pageOrderToVerify);
-    auto rItr = pages.rbegin();
-    std::vector<int> prevs{};
-    while(rItr != pages.rend()) {
-        for(const auto& p : prevs) {
-            if(std::find(masterList[*rItr].after.begin(),masterList[*rItr].after.end(),p) == masterList[*rItr].after.end()) {
-                return false;
+    std::vector<int> reorder(const std::vector<Node>& masterList,const std::string& pageOrderToVerify) {
+        auto pages = parseCsvLineForNum(pageOrderToVerify);
+        auto i = 0;
+        while(i<pages.size()-1) {
+            auto first = pages[i];
+            auto second = pages[i+1];
+            auto itr = std::find(masterList[first].after.begin(),masterList[first].after.end(),second);
+            if(itr == masterList[first].after.end()) {
+                //Order not good
+                std::swap(pages[i],pages[i+1]);
+                i=0;
+            } else {
+                //order is good
+                i++;
             }
         }
-        prevs.push_back(*rItr);
-        rItr++;
+        return pages;
     }
-    return true;
-}
-
-std::vector<int> reorder(const std::vector<Node>& masterList,const std::string& pageOrderToVerify) {
-    auto pages = parseCsvLineForNum(pageOrderToVerify);
-    auto i = 0;
-    while(i<pages.size()-1) {
-        auto first = pages[i];
-        auto second = pages[i+1];
-        auto itr = std::find(masterList[first].after.begin(),masterList[first].after.end(),second);
-        if(itr == masterList[first].after.end()) {
-            //Order not good
-            std::swap(pages[i],pages[i+1]);
-            i=0;
-        } else {
-            //order is good
-            i++;
-        }
-    }
-    return pages;
-}
-
 }
