@@ -12,7 +12,7 @@
 
 namespace AocDay07 {
 //Function Definitions
-bool isValidEquation(const std::string& input);
-bool isValidEquation2(const std::string& input);
+//bool isValidEquation(const std::string& input);
+int64_t validateEquation(const std::string& input, bool addCat = false);
 std::vector<std::string> generatePermutations(const std::string& line);
 }
