@@ -25,7 +25,7 @@ TEST(Y2024_SolveDay15, FinalSolutionPartA) {
 }
 
 TEST(Y2024_SolveDay15, FinalSolutionPartB) {
-    EXPECT_EQ("---", solveb());
+    EXPECT_EQ("1472235", solveb());
 }
 
 TEST(Y2024_Day15Example,Test1) {
@@ -85,4 +85,127 @@ TEST(Y2024_Day15Example,Test4) {
     string sequence = "<vv>^<v^>v>^vv^v>v<>v^v<v<^vv<<<^><<><>>v<vvv<>^v^>^<<<><<v<<<v^vv^v>^vvv<<^>^v^^><<>>><>^<<><^vv^^<>vvv<>><^^v>^>vv<>v<<<<v<^v>^<^^>>>^<v<v><>vv>v^v^<>><>>>><^^>vv>v<^^^>>v^v^<^^>v^^>v^<^v>v<>>v^v^<v>v^^<^^vv<<<v<^>>^^^^>>>v^<>vvv^><v<<<>^^^vv^<vvv>^>v<^^^^v<>^>vvvv><>>v^<<^^^^^^><^><>>><>^^<<^^v>>><^<v>^<vv>>v>>>^v><>^v><<<<v>>v<v<v>vvv>^<><<>^><^>><>^v<><^vvv<^^<><v<<<<<><^v<<<><<<^^<v<^^^><^>>^<v^><<<^>>^v<v^v<v^>^>>^v>vv>^<<^v<>><<><<v<<v><>v<^vv<<<>^^v^>^^>>><<^v>>v^v><^^>>^<>vv^<><^^>^^^<><vvvvv^v<v<<>^v<v>v<<^><<><<><<<^^<<<^<<>><<><^^^>^^<>^>v<>^^>vv<^v^v<vv>^<><v<^v>^^^>>>^^vvv^>vvv<>>>^<^>>>>>^<<^v>^vvv<>^<><<v>v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^";
     performMovementSequence(input,sequence);
     EXPECT_EQ(10092,calcGPS(input));
+}
+
+TEST(Y2024_Day15Example,Test5) {
+    vector<string> input {
+        "#######",
+        "#...#.#",
+        "#.....#",
+        "#..OO@#",
+        "#..O..#",
+        "#.....#",
+        "#######"
+    };
+    expandMap(input);
+    vector<string> expected {
+        "##############",
+        "##......##..##",
+        "##..........##",
+        "##....[][]@.##",
+        "##....[]....##",
+        "##..........##",
+        "##############"
+    };
+    ASSERT_EQ(expected.size(),input.size());
+    for(auto row = 0; row < input.size(); row++) {
+        EXPECT_EQ(expected[row],input[row]);
+    }
+}
+
+TEST(Y2024_Day15Example,Test6) {
+    vector<string> input {
+        "#######",
+        "#...#.#",
+        "#.....#",
+        "#..OO@#",
+        "#..O..#",
+        "#.....#",
+        "#######"
+    };
+    expandMap(input);
+    string sequence = "<vv<<^^<<^^";
+    vector<string> expected {
+        "##############",
+        "##...[].##..##",
+        "##...@.[]...##",
+        "##....[]....##",
+        "##..........##",
+        "##..........##",
+        "##############"
+    };
+    performMovementSequence(input,sequence);
+
+    for(auto row = 0; row < input.size(); row++) {
+        EXPECT_EQ(expected[row],input[row]);
+    }
+}
+
+TEST(Y2024_Day15Example,Test7) {
+    vector<string> input {
+        "####################",
+        "##[].......[].[][]##",
+        "##[]...........[].##",
+        "##[]........[][][]##",
+        "##[]......[]....[]##",
+        "##..##......[]....##",
+        "##..[]............##",
+        "##..@......[].[][]##",
+        "##......[][]..[]..##",
+        "####################"
+    };
+    EXPECT_EQ(9021,calcGPS(input));
+}
+
+TEST(Y2024_Day15Example,Test8) {
+    vector<string> input {
+        "##########",
+        "#..O..O.O#",
+        "#......O.#",
+        "#.OO..O.O#",
+        "#..O@..O.#",
+        "#O#..O...#",
+        "#O..O..O.#",
+        "#.OO.O.OO#",
+        "#....O...#",
+        "##########"
+    };
+    string sequence = "<vv>^<v^>v>^vv^v>v<>v^v<v<^vv<<<^><<><>>v<vvv<>^v^>^<<<><<v<<<v^vv^v>^vvv<<^>^v^^><<>>><>^<<><^vv^^<>vvv<>><^^v>^>vv<>v<<<<v<^v>^<^^>>>^<v<v><>vv>v^v^<>><>>>><^^>vv>v<^^^>>v^v^<^^>v^^>v^<^v>v<>>v^v^<v>v^^<^^vv<<<v<^>>^^^^>>>v^<>vvv^><v<<<>^^^vv^<vvv>^>v<^^^^v<>^>vvvv><>>v^<<^^^^^^><^><>>><>^^<<^^v>>><^<v>^<vv>>v>>>^v><>^v><<<<v>>v<v<v>vvv>^<><<>^><^>><>^v<><^vvv<^^<><v<<<<<><^v<<<><<<^^<v<^^^><^>>^<v^><<<^>>^v<v^v<v^>^>>^v>vv>^<<^v<>><<><<v<<v><>v<^vv<<<>^^v^>^^>>><<^v>>v^v><^^>>^<>vv^<><^^>^^^<><vvvvv^v<v<<>^v<v>v<<^><<><<><<<^^<<<^<<>><<><^^^>^^<>^>v<>^^>vv<^v^v<vv>^<><v<^v>^^^>>>^^vvv^>vvv<>>>^<^>>>>>^<<^v>^vvv<>^<><<v>v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^";
+    expandMap(input);
+    performMovementSequence(input,sequence,false);
+    EXPECT_EQ(9021,calcGPS(input));
+}
+
+TEST(Y2024_Day15Example,Test9) {
+    vector<string> input {
+        "####################",
+        "##....[]....[]..[]##",
+        "##............[]..##",
+        "##..[][]....[]..[]##",
+        "##...[].......[]..##",
+        "##[]##....[]......##",
+        "##[]......[]..[]..##",
+        "##..[][]..@[].[][]##",
+        "##........[]......##",
+        "####################"
+    };
+    
+    string sequence = "^";
+    vector<string> expected {
+        "####################",
+        "##....[]....[]..[]##",
+        "##............[]..##",
+        "##..[][]....[]..[]##",
+        "##...[]...[]..[]..##",
+        "##[]##....[]......##",
+        "##[]......@...[]..##",
+        "##..[][]...[].[][]##",
+        "##........[]......##",
+        "####################"
+    };
+    performMovementSequence(input,sequence, false);
+
+    for(auto row = 0; row < input.size(); row++) {
+        EXPECT_EQ(expected[row],input[row]);
+    }
 }

@@ -13,6 +13,7 @@
 namespace AocDay15 {
 //Function Definitions
 int calcGPS(const std::vector<std::string>& input);
-void performMovementSequence(std::vector<std::string>& input, const std::string& sequence);
+void performMovementSequence(std::vector<std::string>& input, const std::string& sequence, bool debug = false);
+void expandMap(std::vector<std::string>& input);
 
 }

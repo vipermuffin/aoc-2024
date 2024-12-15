@@ -11,26 +11,9 @@
 #include "AoCUtils.h"
 //Common Libraries
 #include <algorithm> //std::sort, find, for_each, max_element, etc
-//#include <array>
 #include <climits>   //INT_MIN, INT_MAX, etc.
-//#include <chrono>
-//#include <iostream>
-//#include <fstream> //ifstream
-//#include <functional> //std::function
-//#include <iomanip> //setfill setw hex
-//#include <map>
-//#include <math.h> //sqrt
-//#include <numeric> //std::accumulate
-//#include <queue>
-//#include <regex>
-//#include <set>
-//#include <sstream>
 #include <stack>
-//#include <thread>
-//#include <tuple>
 #include <unordered_map>
-//#include <unordered_set>
-
 
 using namespace std;
 namespace AocDay15 {
@@ -55,8 +38,20 @@ namespace AocDay15 {
 
     std::string solveb() {
         auto input = parseFileForLines(InputFileName);
-
-		return "---";
+        auto itr = input.begin();
+        //Find the first empty line
+        while(itr != input.end() && itr->size() != 0) {
+            itr++;
+        }
+        auto mapInput = vector<string>(input.begin(), itr);
+        expandMap(mapInput);
+        itr++;
+        auto sequences = vector<string>(itr, input.end());
+        for(auto sequence : sequences) {
+         performMovementSequence(mapInput, sequence);
+        }
+        
+		return to_string(calcGPS(mapInput));
     }
 
     int calcGPS(const std::vector<std::string>& input) {
@@ -64,7 +59,7 @@ namespace AocDay15 {
         int sum = 0;
         for(auto row = 0; row < input.size(); row++) {
             for(auto col = 0; col < input[row].size(); col++) {
-                if(input[row][col] == 'O') {
+                if(input[row][col] == 'O' || input[row][col] == '[') {
                     sum += (row * 100) + col;
                 }
             }
@@ -72,7 +67,7 @@ namespace AocDay15 {
         return sum;
     }
 
-    void performMovementSequence(std::vector<std::string>& input, const std::string& sequence) {
+    void performMovementSequence(std::vector<std::string>& input, const std::string& sequence, bool debug) {
         //Move the '@' character around the grid according to the sequence
         //The sequence is a string of characters '^', 'v', '<', '>' for up, down, left, right
         //The '@' character cannot move through walls ('#')
@@ -103,30 +98,136 @@ namespace AocDay15 {
             auto direction = directions[move];
             auto newRow = currentRow;
             auto newCol = currentCol;
-            stack<pair<int,int>> moves;
+            stack<pair<int,int>> linearMoves;
+            vector<stack<pair<int,int>>> moveStack;
+            //reserve enough vector size so my iterator doesn't get invalidated when adding to the back.
+            moveStack.reserve(input.size()*100);
+            linearMoves.push({newRow,newCol});
+            moveStack.push_back(linearMoves);
+            auto moves = moveStack.begin();
+            vector<vector<bool>> visited(input.size(), vector<bool>(input[0].size(), false));
             //no range checks, assuming will always have a wall
-            while(input[newRow][newCol] != '.' && input[newRow][newCol] != '#') {
-                moves.push({newRow,newCol});
-                newRow += direction.first;
-                newCol += direction.second;
-                if(input[newRow][newCol] == '#') {
-                    //hit a wall
-                    // Clear the stack
-                    while (!moves.empty()) {
-                        moves.pop();
+            while(!moveStack.empty() && moves != moveStack.end()) {
+                newRow = moves->top().first;
+                newCol = moves->top().second;
+                moves->pop();
+                while(input[newRow][newCol] != '.' && input[newRow][newCol] != '#') {
+                    moves->push({newRow,newCol});
+                    visited[newRow][newCol] = true;
+                    newRow += direction.first;
+                    newCol += direction.second;
+                    if(input[newRow][newCol] == '#') {
+                        //hit a wall
+                        // Clear the stack
+                        moveStack.clear();
+                        moves = moveStack.end();
+                    } else if(input[newRow][newCol] == '[') {
+                        //hit a box
+                        // Add a new stack
+                        stack<pair<int,int>> newStack{};
+                        if(direction.second == 0 && !visited[newRow][newCol+1]) {
+                            newStack.push({newRow,newCol+1});
+                            visited[newRow][newCol+1] = true;
+                            auto d = std::distance(moveStack.begin(), moves);
+                            moveStack.push_back(newStack);
+                            moves = moveStack.begin() + d;
+                        }
+                    } else if(input[newRow][newCol] == ']') {
+                        //hit a box
+                        // Add a new stack
+                        stack<pair<int,int>> newStack{};
+                        if(direction.second == 0 && !visited[newRow][newCol-1]) {
+                            newStack.push({newRow,newCol-1});
+                            visited[newRow][newCol-1] = true;
+                            auto d = std::distance(moveStack.begin(), moves);
+                            moveStack.push_back(newStack);
+                            moves = moveStack.begin() + d;
+                        }
                     }
                 }
+                if(input[newRow][newCol] == '.') {
+                    moves->push({newRow,newCol});
+                }
+
+                if(moves != moveStack.end()) {
+                    moves++;
+                }
             }
+            
             //move the '@' character
-            while (!moves.empty()) {
-                auto moveLoc = moves.top();
-                moves.pop();
-                std::swap(input[newRow][newCol], input[moveLoc.first][moveLoc.second]);
-                currentRow = newRow;
-                currentCol = newCol;
-                newRow = moveLoc.first;
-                newCol = moveLoc.second;
+            auto rMoves = moveStack.rbegin();
+            vector<vector<bool>> swapped(input.size(), vector<bool>(input[0].size(), false));
+            while(!moveStack.empty() && rMoves != moveStack.rend()) {
+                newRow = rMoves->top().first;
+                newCol = rMoves->top().second;
+                rMoves->pop();
+                while (!rMoves->empty()) {
+                    auto moveLoc = rMoves->top();
+                    rMoves->pop();
+                    if(!swapped[moveLoc.first][moveLoc.second]) {
+                        swapped[moveLoc.first][moveLoc.second] = true;
+                        
+                        if(debug) {
+                            cout << "Swapping " << input[newRow][newCol] << "<->" << input[moveLoc.first][moveLoc.second] << " from (" << newRow << "," << newCol << ")<->(" << moveLoc.first << "," << moveLoc.second << ")" << endl;
+                        }
+                        std::swap(input[newRow][newCol], input[moveLoc.first][moveLoc.second]);
+                    }
+                    currentRow = newRow;
+                    currentCol = newCol;
+                    newRow = moveLoc.first;
+                    newCol = moveLoc.second;
+                }
+                rMoves++;
             }
+
+            // Debug
+            if(debug) {
+                cout << "Move: " << move << endl;
+                for(auto row = 0; row < input.size(); row++) {
+                    cout << input[row] << endl;
+                }
+            }
+            
         }
+    }
+
+    void expandMap(std::vector<std::string>& input) {
+        //Each line becomes 2x as long
+        //'#' becomes '##'
+        //'O' becomes '[]'
+        //The '@' character becomes '@.'
+        vector<string> newMap;
+        for(auto row = 0; row < input.size(); row++) {
+            string newRow(input[row].size() * 2, '#');
+            auto itr = newRow.begin();
+            for(auto col = 0; col < input[row].size(); col++) {
+                if(input[row][col] == '#') {
+                    *itr = '#';
+                    itr++;
+                    *itr = '#';
+                    itr++;
+                } else if(input[row][col] == 'O') {
+                    *itr = '[';
+                    itr++;
+                    *itr = ']';
+                    itr++;
+                } else if(input[row][col] == '@') {
+                    *itr = '@';
+                    itr++;
+                    *itr = '.';
+                    itr++;
+                } else if(input[row][col] == '.') {
+                    *itr = '.';
+                    itr++;
+                    *itr = '.';
+                    itr++;
+                }else {
+                    cout << "Error: Unknown character in input" << endl;
+                }
+            }
+            newMap.push_back(newRow);
+        }
+
+        std::swap(input, newMap);
     }
 }
