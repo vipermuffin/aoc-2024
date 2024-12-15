@@ -25,7 +25,7 @@ TEST(Y2024_SolveDay14, FinalSolutionPartA) {
 }
 
 TEST(Y2024_SolveDay14, FinalSolutionPartB) {
-    EXPECT_EQ("---", solveb());
+    EXPECT_EQ("6876", solveb());
 }
 
 TEST(Y2024_Day14Example,Test1) {

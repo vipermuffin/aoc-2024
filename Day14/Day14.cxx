@@ -38,22 +38,20 @@ namespace AocDay14 {
         auto yMax = 103;
         const auto limit = 30;
         auto minMult = INT_MAX;
+        auto steps = 0;
         for(int i = 0; i < 7000; i++) {
             stepRoboPositions(positions, xMax, yMax);
             auto counts = countInQuadrants(positions, xMax, yMax);
             auto mult = counts[0] * counts[1] * counts[2] * counts[3];
             if(mult < minMult) {
                 minMult = mult;
-            //}
-            //if(i == 6875)
-            //{
-                
                 printVector(counts);
                 cout << "-----------------------Step " << i << "----------------------------" << endl;
                 printRoboPositions(positions, xMax, yMax);
+                steps = i +1;
             }
         }
-		return "---";
+		return to_string(steps);
     }
 
     RoboPosition parseInput(const std::string& input, const std::string& id) {
