@@ -14,5 +14,5 @@ namespace AocDay17 {
 //Function Definitions
 std::vector<std::pair<int,int>> parseProgram(const std::vector<std::string>& input, std::vector<int>& registers);
 std::string runProgram(const std::vector<std::pair<int,int>>& program, std::vector<int> registers = {0,1,2,3,0,0,0,0});
-int findInitValProgram(const std::vector<std::string>& input);
+uint64_t findInitValProgram(const std::vector<std::string>& input, uint64_t startVal = 0, uint64_t endVal = UINT64_MAX);
 }
