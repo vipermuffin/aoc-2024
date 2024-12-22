@@ -25,7 +25,7 @@ TEST(Y2024_SolveDay22, FinalSolutionPartA) {
 }
 
 TEST(Y2024_SolveDay22, FinalSolutionPartB) {
-    EXPECT_EQ("---", solveb());
+    EXPECT_EQ("2268", solveb());
 }
 
 TEST(Y2024_Day22Example,Test1) {
@@ -62,6 +62,6 @@ TEST(Y2024_Day22Example,Test2) {
 }
 
 TEST(Y2024_Day22Example,Test3) {
-    int x = 0;
-    EXPECT_EQ(0,x);
+    auto m = generatePriceMap(123, 10);
+    EXPECT_EQ(7,m.size());
 }

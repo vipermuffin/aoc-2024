@@ -9,12 +9,15 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <iostream>
 
 namespace AocDay22 {
 //Function Definitions
 uint64_t calcNextNumber(const uint64_t secretNum);
 uint64_t calcNumberAfterSteps(const uint64_t secretNum, const uint64_t steps);
+std::unordered_map<uint32_t, int> generatePriceMap(const uint64_t secretNum, const uint64_t steps);
+
 template <typename T>
 T stringToInteger(const std::string& str, bool isHex = false) {
     static_assert(std::is_integral<T>::value, "Template parameter must be an integral type");
